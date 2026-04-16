@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Video Game Sales Oracle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      :root {
+        --bg1: #f6f8ff;
+        --bg2: #eaf9f7;
+        --bg3: #fff2e3;
+        --card: rgba(255, 255, 255, 0.82);
+        --ink: #0d1321;
+        --muted: #4b5563;
+        --teal: #1fb6ae;
+        --rose: #ff6f61;
+        --sun: #ffb347;
+        --shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+        --border: rgba(15, 23, 42, 0.08);
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: 'Space Grotesk', sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 10% 15%, rgba(255, 179, 71, 0.24), transparent 26%),
+          radial-gradient(circle at 80% 20%, rgba(31, 182, 174, 0.24), transparent 30%),
+          linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 45%, var(--bg3) 100%);
+        min-height: 100vh;
+      }
+
+      .page {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 28px;
+      }
+
+      .hero {
+        padding: 28px;
+        border-radius: 28px;
+        background: linear-gradient(120deg, rgba(255,111,97,0.16), rgba(31,182,174,0.18));
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(2.4rem, 5vw, 4.6rem);
+        line-height: 0.95;
+        letter-spacing: 0.4px;
+      }
+
+      .hero p {
+        margin: 16px 0 0;
+        max-width: 760px;
+        color: var(--muted);
+        font-size: 1.02rem;
+      }
+
+      .pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .pill {
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.64);
+        border: 1px solid var(--border);
+        font-weight: 700;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 18px;
+        margin-top: 18px;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+        border-radius: 22px;
+        backdrop-filter: blur(12px);
+      }
+
+      .stats {
+        grid-column: span 12;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .stat {
+        padding: 18px;
+      }
+
+      .stat .label { color: var(--muted); font-size: 0.92rem; }
+      .stat .value { font-size: 1.8rem; font-weight: 700; margin-top: 6px; }
+
+      .content {
+        grid-column: span 12;
+        display: grid;
+        grid-template-columns: 0.92fr 1.08fr;
+        gap: 18px;
+      }
+
+      .panel {
+        padding: 20px;
+      }
+
+      .panel h2 {
+        margin: 0 0 14px;
+        font-size: 1.2rem;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+
+      select, input {
+        width: 100%;
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        border-radius: 14px;
+        padding: 12px 14px;
+        font: inherit;
+        background: rgba(255,255,255,0.92);
+      }
+
+      .full { grid-column: 1 / -1; }
+
+      .button-row { margin-top: 16px; }
+      button {
+        border: 0;
+        border-radius: 14px;
+        padding: 12px 18px;
+        font: inherit;
+        font-weight: 700;
+        color: white;
+        background: linear-gradient(90deg, var(--teal), var(--rose));
+        cursor: pointer;
+        box-shadow: 0 12px 30px rgba(31, 182, 174, 0.22);
+      }
+
+      .result-box {
+        margin-top: 18px;
+        padding: 18px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(255,179,71,0.18), rgba(255,111,97,0.14));
+        border: 1px solid rgba(15, 23, 42, 0.08);
+      }
+
+      .result-big {
+        font-size: 2.7rem;
+        font-weight: 700;
+        margin-top: 6px;
+      }
+
+      .mini {
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .side-grid {
+        display: grid;
+        gap: 18px;
+      }
+
+      .chart-wrap { padding: 18px; }
+
+      .chart-title {
+        margin: 0 0 12px;
+        font-weight: 700;
+      }
+
+      .two-up {
+        grid-column: span 12;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .list li {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px dashed rgba(15, 23, 42, 0.10);
+      }
+
+      .footer {
+        margin: 18px 0 8px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      @media (max-width: 980px) {
+        .content, .two-up, .stats { grid-template-columns: 1fr; }
+        .form-grid { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="hero">
+        <h1>Video Game Sales Oracle</h1>
+        <p>
+          A Flask-powered prediction studio for video game sales. This model is trained and served using only
+          six features end to end.
+        </p>
+        <div class="pill-row">
+          <div class="pill">6 user inputs</div>
+          <div class="pill">Random Forest model</div>
+          <div class="pill">Decorative dashboard</div>
+          <div class="pill">Docker ready</div>
+        </div>
+      </section>
+
+      <section class="grid stats">
+        <div class="card stat"><div class="label">Rows</div><div class="value">{{ total_rows_formatted }}</div></div>
+        <div class="card stat"><div class="label">Unique Consoles</div><div class="value">{{ unique_consoles }}</div></div>
+        <div class="card stat"><div class="label">Median Sales</div><div class="value">{{ '%.2f'|format(median_sales) }}M</div></div>
+        <div class="card stat"><div class="label">Model</div><div class="value">{{ model_name }}</div></div>
+      </section>
+
+      <section class="grid content">
+        <div class="card panel">
+          <h2>Predict Sales</h2>
+          <form method="post">
+            <div class="form-grid">
+              <div>
+                <label for="console">Console</label>
+                <select id="console" name="console">
+                  {% for item in consoles %}
+                  <option value="{{ item }}" {% if item == selected_console %}selected{% endif %}>{{ item }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div>
+                <label for="genre">Genre</label>
+                <select id="genre" name="genre">
+                  {% for item in genres %}
+                  <option value="{{ item }}" {% if item == selected_genre %}selected{% endif %}>{{ item }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="full">
+                <label for="publisher">Publisher</label>
+                <select id="publisher" name="publisher">
+                  {% for item in publishers %}
+                  <option value="{{ item }}" {% if item == selected_publisher %}selected{% endif %}>{{ item }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div>
+                <label for="release_year">Release Year</label>
+                <input id="release_year" name="release_year" type="number" min="1980" max="2026" value="{{ selected_year }}" />
+              </div>
+
+              <div>
+                <label for="release_month">Release Month</label>
+                <input id="release_month" name="release_month" type="number" min="1" max="12" value="{{ selected_month }}" />
+              </div>
+
+              <div class="full">
+                <label for="critic_score">Critic Score</label>
+                <input id="critic_score" name="critic_score" type="number" min="0" max="100" step="0.1" value="{{ selected_critic }}" />
+              </div>
+            </div>
+
+            <div class="button-row">
+              <button type="submit">Predict Sales</button>
+            </div>
+          </form>
+
+          {% if result %}
+          <div class="result-box">
+            <div class="mini">Predicted total_sales(mil)</div>
+            <div class="result-big">{{ '%.3f'|format(result.prediction) }}</div>
+            <div class="mini">Prediction generated from the same six features used during training.</div>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="side-grid">
+          <div class="card chart-wrap">
+            <h3 class="chart-title">Top Genres by Sales</h3>
+            <canvas id="genreChart" height="180"></canvas>
+          </div>
+          <div class="card chart-wrap">
+            <h3 class="chart-title">Top Consoles by Sales</h3>
+            <canvas id="consoleChart" height="180"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section class="two-up">
+        <div class="card chart-wrap">
+          <h3 class="chart-title">Top Feature Importances</h3>
+          {% if feature_importance %}
+          <canvas id="featureChart" height="260"></canvas>
+          {% else %}
+          <div class="mini">Feature importance file not found yet.</div>
+          {% endif %}
+        </div>
+
+        <div class="card chart-wrap">
+          <h3 class="chart-title">Selected Input Snapshot</h3>
+          {% if features %}
+          <ul class="list">
+            {% for key, value in features.items() %}
+            <li><span>{{ key }}</span><strong>{{ value }}</strong></li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <div class="mini">Submit a prediction to inspect the six model features.</div>
+          {% endif %}
+        </div>
+      </section>
+
+    </div>
+
+    <script id="genre-labels" type="application/json">{{ top_genre_labels | tojson }}</script>
+    <script id="genre-values" type="application/json">{{ top_genre_values | tojson }}</script>
+    <script id="console-labels" type="application/json">{{ top_console_labels | tojson }}</script>
+    <script id="console-values" type="application/json">{{ top_console_values | tojson }}</script>
+    <script id="feature-labels" type="application/json">{{ feature_labels | tojson }}</script>
+    <script id="feature-values" type="application/json">{{ feature_values | tojson }}</script>
+
+    <script>
+      const parseJsonTag = (id) => JSON.parse(document.getElementById(id).textContent || '[]');
+
+      const genreLabels = parseJsonTag('genre-labels');
+      const genreValues = parseJsonTag('genre-values');
+      const consoleLabels = parseJsonTag('console-labels');
+      const consoleValues = parseJsonTag('console-values');
+      const featureLabels = parseJsonTag('feature-labels');
+      const featureValues = parseJsonTag('feature-values');
+
+      const barConfig = (labels, values, color) => ({
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Sales (M)',
+            data: values,
+            backgroundColor: color,
+            borderRadius: 10,
+            borderSkipped: false,
+          }],
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: 'rgba(15,23,42,0.08)' } },
+            y: { grid: { display: false } },
+          },
+        },
+      });
+
+      new Chart(document.getElementById('genreChart'), barConfig(genreLabels, genreValues, 'rgba(31, 182, 174, 0.78)'));
+      new Chart(document.getElementById('consoleChart'), barConfig(consoleLabels, consoleValues, 'rgba(255, 111, 97, 0.78)'));
+
+      if (featureLabels.length) {
+        new Chart(document.getElementById('featureChart'), {
+          type: 'bar',
+          data: {
+            labels: featureLabels,
+            datasets: [{
+              label: 'Importance',
+              data: featureValues,
+              backgroundColor: 'rgba(255, 179, 71, 0.80)',
+              borderRadius: 8,
+              borderSkipped: false,
+            }],
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { display: false } },
+              y: { grid: { color: 'rgba(15,23,42,0.06)' } },
+            },
+          },
+        });
+      }
+    </script>
+  </body>
+</html>
